@@ -14,6 +14,15 @@ b) in the backend folder
 c) in the frontend folder
 `yarn start`
 
+d) MongoDb indexs
+we need to create unique indexes on MongoDb
+`docker exec -it pong-league_mongo_1 bash`
+`mongo`
+`use league`
+
+`db.players.createIndex({phoneNumber: 1},{unique: true})`
+
+
 
 # current status
 I was unable to pay full attention to the coding challenge. I had reserved yesterday for the Task, but while running a short errand to the nearby "city" My car broke down, and since we are in a small town and there are not many "hailing ride" options. I was back super late at my place.Anyway I tried my best in the few hours I could manage. I got the graphQL backend and Front end working to some extent.

@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import {  Player, PlayersState } from '../store/storeTypes';
-import { RootState } from "../store/configureStore";
+import { graphQl_URL } from "../store/configureStore";
 
 export const loadTopPlayers = createAsyncThunk(
     "players/loadTopPlayers",
@@ -16,7 +16,7 @@ export const loadTopPlayers = createAsyncThunk(
               }`
         });
 
-        const response = await fetch('http://localhost:3000/dev/graphql', {
+        const response = await fetch(graphQl_URL, {
             headers: { 'content-type': 'application/json' },
             method: 'POST',
             body: query,
