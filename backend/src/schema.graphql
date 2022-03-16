@@ -4,6 +4,7 @@ type Query {
 
     playerByPartialName(name:String):[Player!]!
     playerByPartialNumber(number:String):[Player!]!
+    topPlayers:[Player!]!
 
 }
 

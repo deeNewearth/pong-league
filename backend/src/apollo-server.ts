@@ -42,6 +42,21 @@ const resolvers = {
         throw new UserInputError('failed to get players');
       }
     },
+    topPlayers: async (root, args, context, info) => {
+      try {
+        // @ts-ignore: Unreachable code error
+        const mongo = await new (mongoDB ).MongoClient(`mongodb://localhost:27017`).connect();
+        const collection = mongo.db('league').collection('players');
+        
+
+        const players: Player[] = (await collection.find().sort({rank:-1}).limit(20).toArray()) as any;
+        
+        return players;
+
+      } catch (error) {
+        throw new UserInputError('failed to get players');
+      }
+    },
     playerByPartialNumber: async (root, args, context, info) => {
       try {
         // @ts-ignore: Unreachable code error
@@ -69,7 +84,7 @@ const resolvers = {
         const matchCollection = mongo.db('league').collection('matches');
 
         const { id} = args;
-        const matches: Match[] = (await matchCollection.find({_id:id}).toArray()) as any;
+        const matches: Match[] = (await matchCollection.find({_id:new ObjectId(id)}).toArray()) as any;
         if(matches.length != 1){
           throw new Error( ` match ${id} not found`);
         }
