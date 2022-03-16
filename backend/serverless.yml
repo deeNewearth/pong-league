@@ -4,12 +4,21 @@ package:
 # Add the serverless-webpack plugin
 plugins:
   - serverless-webpack
+  - serverless-offline
 
 provider:
   name: aws
   runtime: nodejs12.x
 
 functions:
+  graphql:
+    handler: src/apollo-server.graphqlHandler
+    events:
+      - http:
+          path: graphql # define Lambda endpoint
+          method: any # any HTTP method can access this Lambda
+          cors: true # enable CORS
+
   hello:
     handler: src/handler.hello
     events:
@@ -17,6 +26,7 @@ functions:
           method: get
           path: hello
           integration: lambda
+          
   goodbye:
     handler: src/handler2.goodbye
     events:

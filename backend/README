@@ -9,4 +9,27 @@ The lib configuration can and should be removed as soon as the issue has been fi
 You can also try to invoke a function locally:
 ```
 serverless invoke local --function=hello --path=./event.json
+
+
+https://www.freecodecamp.org/news/how-to-build-and-deploy-graphql-server-in-aws-lambda-using-nodejs-and-cloudformation/
+
+
+https://gannochenko.dev/blog/how-to-use-graphql-apollo-server-with-serverless/
+
+https://gannochenko.dev/blog/how-to-use-serverless-with-webpack-and-docker/
+
+
+https://gregshackles.com/getting-started-with-serverless-and-typescript/
+
+
+serverless invoke local --function=hello --path=./event.json
+
+sls webpack serve
+
+
+npx serverless offline start -r eu-central-1 --noTimeout --port 3000 --host 0.0.0.0
+
+https://gannochenko.dev/blog/how-to-use-serverless-with-webpack-and-docker/
+
+https://gannochenko.dev/blog/how-to-use-graphql-apollo-server-with-serverless
 ```
