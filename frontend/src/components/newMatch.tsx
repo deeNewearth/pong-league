@@ -109,7 +109,8 @@ export default function NewMatch({ onClose }: {
 
                 setSubmitted({ result });
 
-                dispatch(loadMatches(result));
+                if(result)
+                    dispatch(loadMatches({lookup:result,type:'id'}));
 
                 onClose();
 

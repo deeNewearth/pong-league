@@ -5,16 +5,16 @@ import { graphQl_URL } from "../store/configureStore";
 
 export const loadMatches = createAsyncThunk(
     "matches/loadMatches",
-    async (id: string) => {
+    async ({lookup, type}: {lookup:string;type:'phoneNumber'|'id'}) => {
 
-        debugger;
-
-        const variables = {
-            matchByIdId: id
+        const variables = type=='id'? {
+            matchByIdId: lookup
+        }:{
+            phoneNumber: lookup
         };
 
         const query = JSON.stringify({
-            query: `query MatchById($matchByIdId: String!) {
+            query: type=='id'?`query MatchById($matchByIdId: String!) {
                 matchById(id: $matchByIdId) {
                   winner {
                     phoneNumber
@@ -26,6 +26,22 @@ export const loadMatches = createAsyncThunk(
                   looser {
                     phoneNumber
                     name
+                  }
+                }
+              }`:`query MatchesByPlayer($phoneNumber: String!) {
+                matchesByPlayer(phoneNumber: $phoneNumber) {
+                  winner {
+                    phoneNumber
+                    name
+                    rank
+                  }
+                  looser {
+                    phoneNumber
+                    name
+                    rank
+                  }
+                  details {
+                    tournament
                   }
                 }
               }`,
@@ -43,7 +59,8 @@ export const loadMatches = createAsyncThunk(
                 message: string
             }[];
             data:{
-                matchById:Match
+                matchById?:Match,
+                matchesByPlayer?:Match[]
             }
         } = await response.json();
 
@@ -51,7 +68,10 @@ export const loadMatches = createAsyncThunk(
             throw new Error(done.errors[0].message);
         }
 
-        return done.data.matchById ;
+        return ({
+            data:done.data,
+            usingId:type=='id'
+        }) ;
     }
 );
 
@@ -66,7 +86,18 @@ export const matchesSlice = createSlice({
 
         });
         builder.addCase(loadMatches.fulfilled, (state, action) => {
-            return {list:[...state.list||[],action.payload]};
+            //return {list:[...state.list||[],action.payload]};
+            const {usingId,data} = action.payload;
+            
+            if(usingId && data.matchById){
+                return {list:[...state.list||[],data.matchById]};
+            }
+
+            if(!usingId && data.matchesByPlayer){
+                return {list:data.matchesByPlayer};
+            }
+
+            return state;
         });
         builder.addCase(loadMatches.rejected, (state, action) => {
             return {error: 'failed to load matches'};
