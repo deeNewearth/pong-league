@@ -26,42 +26,126 @@ const resolvers = {
   Query: {
     playerByPartialName: async (root, args, context, info) => {
       try {
-        const mongo = await new (mongoDB as any).MongoClient(`mongodb://localhost:27017`).connect();
+        // @ts-ignore: Unreachable code error
+        const mongo = await new (mongoDB ).MongoClient(`mongodb://localhost:27017`).connect();
         const collection = mongo.db('league').collection('players');
 
+        const { name} = args;
 
-        const players: Player[] = (await collection.find({}).toArray()) as any;
+        const q = !!name?collection.find({name:new RegExp(name,'i')}):collection.find({});
 
-        console.log(`i am here ${JSON.stringify(players)}`);
-
+        const players: Player[] = (await q.limit(20).toArray()) as any;
+        
         return players;
 
       } catch (error) {
         throw new UserInputError('failed to get players');
       }
     },
-    matchById: async (root, args, context, info) => {
-      return {
-        winner: {
-          id: '2',
-          name: 'ssss',
-          rank: 3
-        },
-        looser: {
-          id: '2',
-          name: 'ssss',
-          rank: 3
-        },
-        id: '123'
-      };
+    playerByPartialNumber: async (root, args, context, info) => {
+      try {
+        // @ts-ignore: Unreachable code error
+        const mongo = await new (mongoDB ).MongoClient(`mongodb://localhost:27017`).connect();
+        const collection = mongo.db('league').collection('players');
+
+        const { number} = args;
+
+        const q = !!number?collection.find({number:new RegExp(number,'i')}):collection.find({});
+
+        const players: Player[] = (await q.limit(20).toArray()) as any;
+        
+        return players;
+
+      } catch (error) {
+        throw new UserInputError('failed to get players');
+      }
     },
+
+    matchById: async (root, args, context, info) => {
+      try {
+        // @ts-ignore: Unreachable code error
+        const mongo = await new (mongoDB ).MongoClient(`mongodb://localhost:27017`).connect();
+        const playerCollection = mongo.db('league').collection('players');
+        const matchCollection = mongo.db('league').collection('matches');
+
+        const { id} = args;
+        const matches: Match[] = (await matchCollection.find({_id:id}).toArray()) as any;
+        if(matches.length != 1){
+          throw new Error( ` match ${id} not found`);
+        }
+
+        const match = matches[0];
+
+        const [winner,looser] = await Promise.all([match.winnerPhoneNumber,match.looserPhoneNumber]
+          .map(async p=>{
+            const found:Player[] = (await playerCollection.find({phoneNumber:p}).toArray()) as any;
+            if(found.length != 1){
+              throw new Error( ` ${p} phone number not found`);
+            }
+            return found[0];
+          }));
+        
+        return {
+          _id:match._id,
+          winner,
+          looser,
+          details:{
+            tournament:match.tournament
+          }
+        };
+
+      } catch (error) {
+        throw new UserInputError('failed to get match');
+      }
+    },
+
+    matchesByPlayer: async (root, args, context, info) => {
+      try {
+        // @ts-ignore: Unreachable code error
+        const mongo = await new (mongoDB ).MongoClient(`mongodb://localhost:27017`).connect();
+        const playerCollection = mongo.db('league').collection('players');
+        const matchCollection = mongo.db('league').collection('matches');
+
+        const { phoneNumber} = args;
+        const matches: Match[] = (await matchCollection.find({$or:[
+            {winnerPhoneNumber:phoneNumber},
+            {looserPhoneNumber:phoneNumber}
+          ]}).toArray()) as any;
+
+      
+        return await Promise.all(matches.map(async match=>{
+          const [winner,looser] = await Promise.all([match.winnerPhoneNumber,match.looserPhoneNumber]
+            .map(async p=>{
+              const found:Player[] = (await playerCollection.find({phoneNumber:p}).toArray()) as any;
+              if(found.length != 1){
+                throw new Error( ` ${p} phone number not found`);
+              }
+              return found[0];
+            }));
+          
+          return {
+            _id:match._id,
+            winner,
+            looser,
+            details:{
+              tournament:match.tournament
+            }
+          };
+        })); 
+
+      } catch (error) {
+        throw new UserInputError('failed to get match');
+      }
+    },
+
+
   },
 
   Mutation: {
     createMatch: async (root, args, context, info) => {
       const { winnerPhoneNumber, looserPhoneNumber, winnerName, looserName , tournament} = args;
       try {
-        //const mongo = await new (mongoDB as any).MongoClient(`mongodb://localhost:27017`).connect();
+        
         // @ts-ignore: Unreachable code error
         const mongo = await new (mongoDB ).MongoClient(`mongodb://localhost:27017`).connect();
 
@@ -103,6 +187,11 @@ const resolvers = {
 
         await matchCollection.insertOne(match);
 
+        //for rank
+        const uniqueWins = await matchCollection.distinct("looserPhoneNumber",{winnerPhoneNumber:winnerPhoneNumber});
+
+        await playerCollection.updateOne({phoneNumber: winnerPhoneNumber},{$set:{rank:uniqueWins.length}});
+
         return match._id;
 
 
@@ -110,24 +199,6 @@ const resolvers = {
         console.error(error);
         //todo NON user friendly errors
         throw new UserInputError(`failed to register : ${error}`);
-      }
-
-
-    },
-    registerPlayer: async (root, args, context, info) => {
-      const { name } = args;
-      try {
-        const mongo = await new (mongoDB as any).MongoClient(`mongodb://localhost:27017`).connect();
-        const collection = mongo.db('league').collection('players');
-
-
-        collection.insertOne({
-          name,
-          rank: 0
-        });
-
-      } catch (error) {
-        throw new UserInputError('failed to register');
       }
 
     }

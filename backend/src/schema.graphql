@@ -1,6 +1,9 @@
 type Query {
-    matchById(id: ID!): Match
+    matchById(id:String!): Match
+    matchesByPlayer(phoneNumber:String!):[Match!]!
+
     playerByPartialName(name:String):[Player!]!
+    playerByPartialNumber(number:String):[Player!]!
 
 }
 
@@ -12,7 +15,7 @@ type Mutation {
         looserName:String,
         tournament:String!
         ): String
-    registerPlayer(name:String!):String
+    
 }
 
 type Match {
