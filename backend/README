@@ -29,6 +29,8 @@ sls webpack serve
 
 npx serverless offline start -r eu-central-1 --noTimeout --port 3000 --host 0.0.0.0
 
+npx serverless offline
+
 https://gannochenko.dev/blog/how-to-use-serverless-with-webpack-and-docker/
 
 https://gannochenko.dev/blog/how-to-use-graphql-apollo-server-with-serverless

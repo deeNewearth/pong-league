@@ -1,0 +1,1 @@
+db.players.createIndex({phoneNumber: 1},{unique: true})

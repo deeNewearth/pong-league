@@ -1,12 +1,34 @@
 type Query {
-  item(id: ID!): Item
+    matchById(id: ID!): Match
+    playerByPartialName(name:String):[Player!]!
+
 }
 
 type Mutation {
-  createItem(content: String!): Item
+    createMatch(
+        winnerPhoneNumber:String!,
+        looserPhoneNumber:String!,
+        winnerName:String,
+        looserName:String,
+        tournament:String!
+        ): String
+    registerPlayer(name:String!):String
 }
 
-type Item {
-  id: ID!
-  content: String
+type Match {
+    _id: String
+    winner: Player!
+    looser: Player!
+    details: MatchDetails!
+}
+
+type Player{
+    _id: String
+    phoneNumber: String!
+    name: String!
+    rank: Int!
+}
+
+type MatchDetails{
+    tournament: String!
 }
