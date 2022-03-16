@@ -44,13 +44,15 @@ function PlayerEdit({ player, setPlayer }: {
 }
 
 
-export default function NewMatch() {
+export default function NewMatch({onClose}:{
+    onClose:()=>any
+}) {
     const [submitted, setSubmitted] = useState<IAsyncResult<string>>();
     const [winner, setWinner] = useState<MatchPlayer>();
     const [looser, setLooser] = useState<MatchPlayer>();
     const [details, setDetails] = useState<MatchDetails>();
 
-    return <Modal show={true} onHide={() => { }}>
+    return <Modal show={true} onHide={() => onClose()}>
         <Form onSubmit={async e=>{
             e.preventDefault();
             try{
@@ -98,13 +100,15 @@ export default function NewMatch() {
 
               setSubmitted({result});
 
+              onClose();
+
 
             }catch(error:any){
                 setSubmitted({error});
             }
         }}>
         <Modal.Header closeButton>
-            <Modal.Title>New Match</Modal.Title>
+            <Modal.Title>Register new game</Modal.Title>
         </Modal.Header>
         <Modal.Body className="newMatch">
 
@@ -139,7 +143,7 @@ export default function NewMatch() {
 
             {submitted?.error && <ShowError error={submitted.error}/> }
 
-            <Button variant="secondary" onClick={() => { }}>
+            <Button variant="secondary" onClick={() => onClose()}>
                 Close
             </Button>
             <Button variant="primary"  type="submit"  >

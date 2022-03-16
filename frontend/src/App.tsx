@@ -6,16 +6,16 @@ import './App.scss';
 import NewMatchView from './components/newMatch';
 
 function App() {
-  const [showNewMatch, setShowNewMatch] = useState(true);
+  const [showNewMatch, setShowNewMatch] = useState(false);
 
 
   return (
-    <div className="App">
-      hello world
+    <div className="App p-5">
+      
 
-      {showNewMatch && <NewMatchView/>}
+      {showNewMatch && <NewMatchView onClose={()=>setShowNewMatch(false)}/>}
 
-      <Button variant="primary" onClick={()=>setShowNewMatch(true)}>new match</Button>
+      <Button variant="primary" onClick={()=>setShowNewMatch(true)}>Register new game</Button>
     </div>
   );
 }
