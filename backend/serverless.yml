@@ -19,21 +19,6 @@ functions:
           method: any # any HTTP method can access this Lambda
           cors: true # enable CORS
 
-  hello:
-    handler: src/handler.hello
-    events:
-      - http:
-          method: get
-          path: hello
-          integration: lambda
-          
-  goodbye:
-    handler: src/handler2.goodbye
-    events:
-      - http:
-          method: get
-          path: goodbye
-          integration: lambda
 custom:
   webpack:
     webpackConfig: 'webpack.config.js'
